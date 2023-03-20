@@ -29,12 +29,8 @@ Try ~package-refresh-contents~ as a quickfix when a package is not found.
                        markdown-mode
                        magit
                        flycheck
-                       irony
                        ivy
                        ivy-bibtex
-                       company-irony
-                       flycheck-irony
-                       irony-eldoc
                        slime
                        slime-company
                        all-the-icons
@@ -45,7 +41,6 @@ Try ~package-refresh-contents~ as a quickfix when a package is not found.
                        load-relative
                        elpy
                        rainbow-delimiters
-                       rtags
                        cmake-ide
                        yaml-mode
                        visual-fill-column
@@ -90,9 +85,6 @@ Try ~package-refresh-contents~ as a quickfix when a package is not found.
                        ob-async
                        company
                        flycheck
-                       irony
-                       company-irony
-                       flycheck-irony
                        eldoc
                        slime
                        slime-company
@@ -240,30 +232,6 @@ Recentf bind to openfiles
   (defun my/python-mode-hook ()
     (add-to-list 'company-backends 'company-jedi))
   (add-hook 'python-mode-hook 'my/python-mode-hook)
-
-  (eval-after-load 'company '(add-to-list 'company-backends 'company-irony))
-#+end_src
-** irony
-*** Prerequisites
-- libclang (~apt-get install libclang-dev~)
-- clang (~apt-get install clang~)
-- llvm (~apt-get install llvm~)
-
-For issues like ~missing clang-config.cmake~ or ~missing llvm-config.cmake~ try to install
-- clang-devel and
-- llvm-devel
-
-read [[https://martinsosic.com/development/emacs/2017/12/09/emacs-cpp-ide.html][emacs c++ editor]]
-#+begin_src emacs-lisp
-  (unless (irony--find-server-executable) (call-interactively #'irony-install-server))
-  (add-hook 'c++-mode-hook 'irony-mode)
-  (add-hook 'c-mode-hook 'irony-mode)
-
-  (setq-default irony-cdb-compilation-databases '(irony-cdb-libclang
-                                                  irony-cdb-clang-complete))
-
-  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-  (add-hook 'irony-mode-hook #'irony-eldoc)
 #+end_src
 ** ivy
 from [[https://writequit.org/denver-emacs/presentations/2017-04-11-ivy.html]]
@@ -272,60 +240,6 @@ from [[https://writequit.org/denver-emacs/presentations/2017-04-11-ivy.html]]
     :config
     (setq ivy-use-virtual-buffers t
           ivy-count-format "%d/%d "))
-#+end_src
-** rtags
-Copied from:
-- [[https://github.com/Andersbakken/rtags]]
-- [[https://github.com/atilaneves/cmake-ide]]
-- [[http://www.mycpu.org/emacs-rtags-helm/]]
-
-If the rtags build is not working:
-1. make sure LLVM is installed
-2. llvm-config is available in ~PATH~
-
-The path to the llvm can be specified in the build command like:
-#+begin_src sh
-  git clone --recursive https://github.com/Andersbakken/rtags.git
-  cd rtags
-  cmake -DLIBCLANG_LLVM_CONFIG_EXECUTABLE=/path/to/llvm-config -DCMAKE_EXPORT_COMPILE_COMMANDS=1 .
-  make
-#+end_src
--> desribed in [[https://github.com/Andersbakken/rtags/issues/494]]
-
-#+begin_src elisp
-  ;; ensure that we use only rtags checking
-  ;; https://github.com/Andersbakken/rtags#optional-1
-  (defun setup-flycheck-rtags ()
-    (interactive)
-    (flycheck-select-checker 'rtags)
-    ;; RTags creates more accurate overlays.
-    (setq-local flycheck-highlighting-mode nil)
-    (setq-local flycheck-check-syntax-automatically nil))
-
-  ;; only run this if rtags is installed
-  (when (require 'rtags nil :noerror)
-    (define-key c-mode-base-map (kbd "M-.")
-      (function rtags-find-symbol-at-point))
-    (define-key c-mode-base-map (kbd "M-,")
-      (function rtags-find-references-at-point))
-    ;; install standard rtags keybindings. Do M-. on the symbol below to
-    ;; jump to definition and see the keybindings.
-    (rtags-enable-standard-keybindings)
-    ;; company completion setup
-    (setq rtags-autostart-diagnostics t
-          rtags-path "~/rtags/bin")
-    (rtags-diagnostics)
-    (setq rtags-completions-enabled t)
-    (push 'company-rtags company-backends)
-    (global-company-mode)
-    (define-key c-mode-base-map (kbd "<C-tab>") (function company-complete))
-    ;; use rtags flycheck mode -- clang warnings shown inline
-    (require 'flycheck-rtags)
-    (cmake-ide-setup)
-    (add-hook 'c-mode-hook 'rtags-start-process-unless-running)
-    (add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
-    ;; c-mode-common-hook is also called by c++-mode
-    (add-hook 'c-mode-common-hook #'setup-flycheck-rtags))
 #+end_src
 ** ibuffer
 #+begin_src emacs-lisp
@@ -341,10 +255,6 @@ The path to the llvm can be specified in the build command like:
     (all-the-icons-install-fonts t))
   (setq all-the-icons-scale-factor 1)
   (all-the-icons-ibuffer-mode 1)
-#+end_src
-** flycheck
-#+begin_src emacs-lisp
-  (eval-after-load 'flycheck '(add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
 #+end_src
 
 ** dired
@@ -984,8 +894,4 @@ Same as [[vue][*vue]] -> needs ~lsp-mode~
 (setq org-todo-keywords
       '((sequence "TODO" "IN-PROGRESS" "WAITING" "DONE")))
 #+END_SRC
-
-
-
-
 
