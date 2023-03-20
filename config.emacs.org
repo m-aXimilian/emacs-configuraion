@@ -31,6 +31,13 @@ Try ~package-refresh-contents~ as a quickfix when a package is not found.
                        flycheck
                        ivy
                        ivy-bibtex
+<<<<<<< Updated upstream
+=======
+                       company-irony
+                       flycheck-irony
+                       flycheck-rtags
+                       irony-eldoc
+>>>>>>> Stashed changes
                        slime
                        slime-company
                        all-the-icons
@@ -528,20 +535,38 @@ Show/hide text regions.
 #+end_src
 
 ** org-present
+Mostly from [[https://systemcrafters.net/emacs-tips/presentations-with-org-present/]]
 #+begin_src elisp
   (defun my/org-present-mode-hook ()
     "Setup org-present-mode."
-    (org-display-inline-images))
+    (org-display-inline-images)
+    (setq-local face-remapping-alist '((default (:height 1.5) variable-pitch)
+                                       (header-line (:height 4.0) variable-pitch)
+                                       (org-document-title (:height 1.75) org-document-title)
+                                       (org-code (:height 1.55) org-code)
+                                       (org-verbatim (:height 1.55) org-verbatim)
+                                       (org-block (:height 1.25) org-block)
+                                       (org-block-begin-line (:height 0.7) org-block))))
 
   (defun my/org-present-mode-hook-quit ()
     "Revert settings from my/org-present-mode-hook when leaving org-present-mode."
+    (setq-local face-remapping-alist '((default variable-pitch default)))
+    (setq header-line-format nil)
     (org-remove-inline-images))
+
+  (defun my/org-present-prepare-slide (buffer-name heading)
+    "Show only one heading at a time"
+    (org-overview)
+    (org-show-entry)
+    (org-show-children))
 
   (use-package org-present
     :ensure t
     :hook ((org-present-mode . my/org-present-mode-hook)
+           (org-present-run-after-navigate-functions . my/org-present-prepare-slide)
            (org-present-mode-quit . my/org-present-mode-hook-quit)))
 #+end_src
+
 
 * Languages
 ** C/C++
