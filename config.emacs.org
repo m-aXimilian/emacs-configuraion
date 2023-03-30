@@ -568,6 +568,8 @@ Mostly from [[https://systemcrafters.net/emacs-tips/presentations-with-org-prese
   (define-key c-mode-base-map (kbd "<f6>") 'recompile)
   (add-hook 'c-mode-hook 'origami-mode)
   (add-hook 'c++-mode-hook 'origami-mode)
+  (add-hook 'c-mode-hook 'lsp-mode)
+  (add-hook 'c++-mode-hook 'lsp-mode)
 #+end_src
 
 ** latex
